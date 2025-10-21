@@ -1,4 +1,4 @@
-# Note: Logger.warn exceptions because the :ssh_client_key_api will silently
+# Note: Logger.warning exceptions because the :ssh_client_key_api will silently
 # catches exceptions
 defmodule SSHClientKeyAPI do
   @external_resource "README.md"
@@ -43,8 +43,8 @@ defmodule SSHClientKeyAPI do
 
     opts =
       opts
-      |> Keyword.put(:identity_data, IO.binread(opts[:identity], :all))
-      |> Keyword.put(:known_hosts_data, IO.binread(opts[:known_hosts], :all))
+      |> Keyword.put(:identity_data, IO.binread(opts[:identity], :eof))
+      |> Keyword.put(:known_hosts_data, IO.binread(opts[:known_hosts], :eof))
 
     {__MODULE__, opts}
   end
@@ -70,7 +70,7 @@ defmodule SSHClientKeyAPI do
     end
   rescue
     e ->
-      Logger.warn("Exception in add_host_key: #{inspect(e)}")
+      Logger.warning("Exception in add_host_key: #{inspect(e)}")
       raise e
   end
 
@@ -79,7 +79,7 @@ defmodule SSHClientKeyAPI do
     :ssh_file.is_host_key(key, host, port, alg, opts)
   rescue
     e ->
-      Logger.warn("Exception in is_host_key: #{inspect(e)}")
+      Logger.warning("Exception in is_host_key: #{inspect(e)}")
   end
 
   # There's a fundamental disconnect between how the key_cb option works and how
@@ -113,11 +113,11 @@ defmodule SSHClientKeyAPI do
             message =
               "unable to decode key, possibly because the key type does not support a passphrase"
 
-            Logger.warn(message)
+            Logger.warning(message)
             {:error, :key_decode_failed}
 
           other ->
-            Logger.warn("Unexpected return value from :ssh_file.decode/2 #{inspect(other)}")
+            Logger.warning("Unexpected return value from :ssh_file.decode/2 #{inspect(other)}")
             {:error, :ssh_client_key_api_unable_to_decode_key}
         end
 
@@ -131,25 +131,17 @@ defmodule SSHClientKeyAPI do
         {:ok, result}
 
       error ->
-        Logger.warn("Unexpected return value from :public_key.decode/2 #{inspect(error)}")
+        Logger.warning("Unexpected return value from :public_key.decode/2 #{inspect(error)}")
         {:error, :ssh_client_key_api_unable_to_decode_key}
     end
   rescue
     e ->
-      Logger.warn("user_key exception: #{inspect(e)}")
+      Logger.warning("user_key exception: #{inspect(e)}")
       raise e
   end
 
   defp cb_opts(opts) do
     opts[:key_cb_private]
-  end
-
-  defp known_hosts_data(opts) do
-    cb_opts(opts)[:known_hosts_data]
-  end
-
-  defp known_hosts(opts) do
-    cb_opts(opts)[:known_hosts]
   end
 
   defp silently_accept_hosts(opts) do
@@ -168,7 +160,7 @@ defmodule SSHClientKeyAPI do
         passphrase
 
       passphrase when is_binary(passphrase) ->
-        Logger.warn("Passphrase must be a charlist, not a binary. Ignoring.")
+        Logger.warning("Passphrase must be a charlist, not a binary. Ignoring.")
         nil
 
       nil ->
