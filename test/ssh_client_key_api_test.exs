@@ -148,7 +148,7 @@ defmodule SSHClientKeyAPITest do
     result =
       SSHClientKeyAPI.is_host_key(
         @host_key,
-        'github.com',
+        ~c"github.com",
         @port,
         :"ssh-dss",
         key_cb_private: [
@@ -167,7 +167,7 @@ defmodule SSHClientKeyAPITest do
     result =
       SSHClientKeyAPI.is_host_key(
         @host_key,
-        'other.com',
+        ~c"other.com",
         @port,
         :"ssh-dss",
         key_cb_private: [
@@ -210,7 +210,7 @@ defmodule SSHClientKeyAPITest do
       SSHClientKeyAPI.user_key(
         :"ssh-dss",
         key_cb_private: [
-          passphrase: 'wrong',
+          passphrase: ~c"wrong",
           identity: protected_key,
           identity_data: IO.binread(protected_key, :eof)
         ]
@@ -226,7 +226,7 @@ defmodule SSHClientKeyAPITest do
       SSHClientKeyAPI.user_key(
         :"ssh-scooby-doo",
         key_cb_private: [
-          passphrase: 'wrong',
+          passphrase: ~c"wrong",
           identity: protected_key,
           identity_data: IO.binread(protected_key, :eof)
         ]
@@ -241,7 +241,7 @@ defmodule SSHClientKeyAPITest do
       SSHClientKeyAPI.user_key(
         :"ssh-dss",
         key_cb_private: [
-          passphrase: 'phrase',
+          passphrase: ~c"phrase",
           identity: protected_key,
           identity_data: IO.binread(protected_key, :eof)
         ]
