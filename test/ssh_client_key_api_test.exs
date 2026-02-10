@@ -114,12 +114,12 @@ defmodule SSHClientKeyAPITest do
       key_cb_private: [
         silently_accept_hosts: true,
         known_hosts: known_hosts,
-        known_hosts_data: IO.binread(known_hosts, :all)
+        known_hosts_data: IO.binread(known_hosts, :eof)
       ]
     )
 
     :file.position(known_hosts, :bof)
-    result = IO.binread(known_hosts, :all)
+    result = IO.binread(known_hosts, :eof)
     assert result =~ "example.com"
   end
 
@@ -134,7 +134,7 @@ defmodule SSHClientKeyAPITest do
         key_cb_private: [
           silently_accept_hosts: false,
           known_hosts: known_hosts,
-          known_hosts_data: IO.binread(known_hosts, :all)
+          known_hosts_data: IO.binread(known_hosts, :eof)
         ]
       )
 
@@ -154,7 +154,7 @@ defmodule SSHClientKeyAPITest do
         key_cb_private: [
           silently_accept_hosts: false,
           known_hosts: known_hosts,
-          known_hosts_data: IO.binread(known_hosts, :all)
+          known_hosts_data: IO.binread(known_hosts, :eof)
         ]
       )
 
@@ -173,7 +173,7 @@ defmodule SSHClientKeyAPITest do
         key_cb_private: [
           silently_accept_hosts: false,
           known_hosts: known_hosts,
-          known_hosts_data: IO.binread(known_hosts, :all)
+          known_hosts_data: IO.binread(known_hosts, :eof)
         ]
       )
 
@@ -184,7 +184,7 @@ defmodule SSHClientKeyAPITest do
     result =
       SSHClientKeyAPI.user_key(
         :"ssh-dss",
-        key_cb_private: [identity: key, identity_data: IO.binread(key, :all)]
+        key_cb_private: [identity: key, identity_data: IO.binread(key, :eof)]
       )
 
     assert result == {:ok, @decoded_pem}
@@ -197,7 +197,7 @@ defmodule SSHClientKeyAPITest do
     assert_raise KeyError, ~r/passphrase required/, fn ->
       SSHClientKeyAPI.user_key(
         :"ssh-dss",
-        key_cb_private: [identity: protected_key, identity_data: IO.binread(protected_key, :all)]
+        key_cb_private: [identity: protected_key, identity_data: IO.binread(protected_key, :eof)]
       )
     end
   end
@@ -212,7 +212,7 @@ defmodule SSHClientKeyAPITest do
         key_cb_private: [
           passphrase: 'wrong',
           identity: protected_key,
-          identity_data: IO.binread(protected_key, :all)
+          identity_data: IO.binread(protected_key, :eof)
         ]
       )
     end
@@ -228,7 +228,7 @@ defmodule SSHClientKeyAPITest do
         key_cb_private: [
           passphrase: 'wrong',
           identity: protected_key,
-          identity_data: IO.binread(protected_key, :all)
+          identity_data: IO.binread(protected_key, :eof)
         ]
       )
     end
@@ -243,7 +243,7 @@ defmodule SSHClientKeyAPITest do
         key_cb_private: [
           passphrase: 'phrase',
           identity: protected_key,
-          identity_data: IO.binread(protected_key, :all)
+          identity_data: IO.binread(protected_key, :eof)
         ]
       )
 
